@@ -1,0 +1,473 @@
+swagger: '2.0'
+info:
+  description: 'AAA (Automation Acceleration Action) is a project that will allow all members to send a suggestion through the API. All these suggestions can be accessed by authorized admins through a login, they will also be able to update the evolution of the suggestion. The contributor and the admins will receive an email at each evolution of the suggestion.'
+  version: 1.0.0
+  title: AAA Automation Acceleration Action
+host: suggestion.axa.co.jp
+basePath: /v1
+tags:
+  - name: suggestion
+    description: Everything about your suggestion
+  - name: admin
+    description: Admin auth
+  - name: history
+    description: Access modification history
+schemes:
+  - https
+  - http
+paths:
+  /suggestion:
+    post:
+      tags:
+        - suggestion
+      summary: Add a new suggestion
+      description: ''
+      operationId: addSuggestion
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: "sendEmail"
+          in: query
+          description: "Should e-mail be sent or not?"
+          required: true
+          type: "boolean"
+        - in: body
+          name: body
+          description: Suggestion that needs to be added.
+          required: true
+          schema:
+            $ref: '#/definitions/Suggestion'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Suggestion'
+        '405':
+          description: Invalid input
+    get:
+      tags:
+        - suggestion
+      summary: Find all suggestions
+      description: ''
+      operationId: findSuggestions
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Suggestion'
+      security:
+        - ApiKeyAuth: []
+  /suggestion/{suggestionId}:
+    get:
+      tags:
+      - "suggestion"
+      summary: "Find suggestion by ID"
+      description: "Returns a single suggestion"
+      operationId: "getSuggestionById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "suggestionId"
+        in: "path"
+        description: "ID of suggestion to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Suggestion"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Suggestion not found"
+      security:
+        - ApiKeyAuth: []
+    put:
+      tags:
+        - "suggestion"
+      summary: Updated suggestion
+      description: This can only be done by the logged in admin.
+      operationId: updateSuggestion
+      produces:
+        - application/json
+      parameters:
+        - name: "suggestionId"
+          in: "path"
+          description: "ID of suggestion to return"
+          required: true
+          type: "integer"
+          format: "int64"
+        - name: "login"
+          in: query
+          description: "Login of the administrator"
+          required: true
+          type: string
+        - name: "sendEmail"
+          in: query
+          description: "Should e-mail be sent or not?"
+          required: true
+          type: "boolean"
+        - in: body
+          name: body
+          description: Updated suggestion object
+          required: true
+          schema:
+            $ref: '#/definitions/Suggestion'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            items:
+              $ref: '#/definitions/Suggestion'
+        '400':
+          description: Invalid suggestion supplied
+        '404':
+          description: Suggestion not found
+      security:
+        - ApiKeyAuth: []
+    delete:
+      tags:
+      - "suggestion"
+      summary: "Deletes a suggestion"
+      description: ""
+      operationId: "deleteSuggestion"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "suggestionId"
+        in: "path"
+        description: "Suggestion id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Suggestion not found"
+      security:
+        - ApiKeyAuth: []
+  /login:
+    post:
+      tags:
+        - admin
+      summary: Check a login
+      description: ''
+      operationId: checkLogin
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: "Login to be checked"
+          required: true
+          schema:
+            $ref: '#/definitions/Login'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                example: 84hfs9uy39hfs
+        '400':
+          description: Error occured
+        '404':
+          description: Invalid Login/Password
+  /register:
+    post:
+      tags:
+        - admin
+      summary: Register an admin
+      description: ''
+      operationId: registerAdmin
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: "Login and password"
+          required: true
+          schema:
+            $ref: '#/definitions/Login'
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                example: 84hfs9uy39hfs
+        '400':
+          description: Error occured
+        '403':
+          description: Login already exists
+      security:
+        - ApiKeyAuth: []
+  /history:
+    get:
+      tags:
+        - history
+      summary: Find all history
+      description: ''
+      operationId: findHistory
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: successful operation
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/History'
+      security:
+        - ApiKeyAuth: []
+  /history/{historyId}:
+    get:
+      tags:
+      - "history"
+      summary: "Find history by ID"
+      description: "Returns a single history"
+      operationId: "getHistoryById"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "historyId"
+        in: "path"
+        description: "ID of history to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/History"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "History not found"
+      security:
+        - ApiKeyAuth: []
+    delete:
+      tags:
+      - "history"
+      summary: "Deletes a history"
+      description: ""
+      operationId: "deleteHistory"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "historyId"
+        in: "path"
+        description: "History id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "History not found"
+      security:
+        - ApiKeyAuth: []
+  /history/admin/{adminId}:
+    get:
+      tags:
+      - "history"
+      summary: "Find history by admin ID"
+      description: "Returns the history of an admin"
+      operationId: "getHistoryByAdminId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "adminId"
+        in: "path"
+        description: "ID of admin history to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/History"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "History not found"
+      security:
+        - ApiKeyAuth: []
+  /history/suggestion/{suggestionId}:
+    get:
+      tags:
+      - "history"
+      summary: "Find history by suggestion ID"
+      description: "Returns the history of a suggestion"
+      operationId: "getHistoryBySuggestionId"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "suggestionId"
+        in: "path"
+        description: "ID of suggestion history to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/History"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "History not found"
+      security:
+        - ApiKeyAuth: []
+    delete:
+      tags:
+      - "history"
+      summary: "Deletes all history of a suggestion"
+      description: ""
+      operationId: "deleteSuggestionHistory"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "suggestionId"
+        in: "path"
+        description: "Suggestion id to delete history"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "History not found"
+      security:
+        - ApiKeyAuth: []
+definitions:
+  Suggestion:
+    type: object
+    required:
+      - contributorName
+      - contributorEmail
+      - contributorTeam
+      - category
+      - description
+      - personDayCurrent
+      - personDayFuture
+      - cost
+    properties:
+      id:
+        type: integer
+        format: int64
+      date:
+        type: string
+        format: datetime
+      contributorName:
+        type: string
+        example: John Doe
+      contributorEmail:
+        type: string
+        example: johndoe@axa.co.jp
+      contributorTeam:
+        type: string
+        example: DevOps
+      category:
+        type: string
+        example: Efficiency
+      targetedSystem:
+        type: string
+        example: Tool
+      description:
+        type: string
+        example: Description of the idea.
+      personDayCurrent:
+        type: integer
+        format: int64
+        example: 10
+      personDayFuture:
+        type: integer
+        format: int64
+        example: 5
+      cost:
+        type: integer
+        format: int64
+        example: 100000
+      gatewayStatus:
+        type: string
+        example: tier 3
+      approvalStatus:
+        type: string
+        example: rejected
+      remark:
+        type: string
+        example: remark
+    xml:
+      name: Suggestion
+  History:
+    type: object
+    required:
+      - adminId
+      - suggestionId
+      - modification
+    properties:
+      id:
+        type: integer
+        format: int64
+      date:
+        type: string
+        format: datetime
+        example: 2019-03-23
+      adminId:
+        type: integer
+        format: int64
+      suggestionId:
+        type: integer
+        format: int64
+      modification:
+        type: string
+    xml:
+      name: history
+  Login:
+    type: object
+    required:
+      - login
+      - password
+    properties:
+      id:
+        type: integer
+        format: int64
+      login:
+        type: string
+      password:
+        type: string
+
+    xml:
+      name: history
+securityDefinitions:
+  ApiKeyAuth:
+    type: apiKey
+    in: header
+    name: Token
+  

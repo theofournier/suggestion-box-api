@@ -1,0 +1,45 @@
+{
+  "plugins": [
+    "jest"
+  ],
+  "extends": [
+    "airbnb-base"
+  ],
+  "env": {
+    "jest/globals": true
+  },
+  "rules": {
+    "linebreak-style": 0,
+    "arrow-body-style": "off",
+    "arrow-parens": [
+      "error",
+      "always"
+    ],
+    "no-shadow": [
+      "error",
+      {
+        "builtinGlobals": true
+      }
+    ],
+    "no-underscore-dangle": "off",
+    "no-plusplus": [
+      "warn",
+      {
+        "allowForLoopAfterthoughts": true
+      }
+    ],
+    "prefer-destructuring": "warn",
+    "space-before-function-paren": [
+      "error",
+      "never"
+    ],
+    "max-len": [
+      "warn",
+      {
+        "code": 150,
+        "ignoreComments": true
+      }
+    ],
+    "no-param-reassign": ["error", { "props": false }]
+  }
+}
